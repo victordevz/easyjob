@@ -1,9 +1,25 @@
-import { ensureBetaSignupSchema, getDb } from "../../../db";
-import { betaSignups } from "../../../db/schema";
 import {
   type BetaSignupInput,
   validateBetaSignup,
 } from "../../../lib/beta-signup";
+
+export const runtime = "nodejs";
+
+type SheetsMirrorConfig = {
+  url: string;
+  secret: string;
+};
+
+type SheetsMirrorPayload = {
+  id: string;
+  name: string;
+  email: string;
+  whatsapp: string;
+  consent: true;
+  consentedAt: string;
+  createdAt: string;
+  status: string;
+};
 
 function isExternalOrigin(request: Request) {
   const origin = request.headers.get("origin");
@@ -13,10 +29,70 @@ function isExternalOrigin(request: Request) {
   }
 
   try {
-    return new URL(origin).host !== new URL(request.url).host;
+    const requestHost =
+      request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
+      request.headers.get("host") ||
+      new URL(request.url).host;
+
+    return new URL(origin).host !== requestHost;
   } catch {
     return true;
   }
+}
+
+function getSheetsConfig(): SheetsMirrorConfig | null {
+  if (
+    !process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    !process.env.GOOGLE_SHEETS_WEBHOOK_SECRET
+  ) {
+    return null;
+  }
+
+  return {
+    url: process.env.GOOGLE_SHEETS_WEBHOOK_URL,
+    secret: process.env.GOOGLE_SHEETS_WEBHOOK_SECRET,
+  };
+}
+
+async function saveSignupToGoogleSheets(payload: SheetsMirrorPayload) {
+  const config = getSheetsConfig();
+
+  if (!config) {
+    throw new Error("Google Sheets não está configurado.");
+  }
+
+  const response = await fetch(config.url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8",
+    },
+    body: JSON.stringify({
+      ...payload,
+      secret: config.secret,
+    }),
+    redirect: "follow",
+    signal: AbortSignal.timeout(10_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Google Sheets respondeu com HTTP ${response.status}.`);
+  }
+
+  const result = (await response.json()) as {
+    ok?: boolean;
+    error?: string;
+    alreadyRegistered?: boolean;
+  };
+
+  if (!result.ok) {
+    throw new Error(
+      `Google Sheets recusou a inscrição: ${result.error ?? "erro desconhecido"}.`,
+    );
+  }
+
+  return {
+    alreadyRegistered: result.alreadyRegistered === true,
+  };
 }
 
 export async function POST(request: Request) {
@@ -58,32 +134,32 @@ export async function POST(request: Request) {
   }
 
   try {
-    await ensureBetaSignupSchema();
-    const db = getDb();
     const now = new Date().toISOString();
-    const inserted = await db
-      .insert(betaSignups)
-      .values({
-        id: crypto.randomUUID(),
-        name: validation.values.name,
-        email: validation.values.email,
-        whatsapp: validation.values.whatsapp,
-        consent: true,
-        consentAt: now,
-        createdAt: now,
-        status: "waiting",
-      })
-      .onConflictDoNothing()
-      .returning({ id: betaSignups.id });
+    const signupId = crypto.randomUUID();
+    const result = await saveSignupToGoogleSheets({
+      id: signupId,
+      name: validation.values.name,
+      email: validation.values.email,
+      whatsapp: validation.values.whatsapp,
+      consent: true,
+      consentedAt: now,
+      createdAt: now,
+      status: "Aguardando",
+    });
 
     return Response.json(
       {
         ok: true,
-        alreadyRegistered: inserted.length === 0,
+        alreadyRegistered: result.alreadyRegistered,
       },
-      { status: inserted.length === 0 ? 200 : 201 },
+      { status: result.alreadyRegistered ? 200 : 201 },
     );
-  } catch {
+  } catch (error) {
+    console.error(
+      "Não foi possível salvar a inscrição.",
+      error instanceof Error ? error.message : "Erro desconhecido.",
+    );
+
     return Response.json(
       {
         ok: false,

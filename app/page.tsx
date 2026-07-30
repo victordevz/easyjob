@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { BetaSignupForm } from "./beta-signup-form";
 
 const journey = [
@@ -116,6 +117,22 @@ export default function Home() {
             <div className="plan-card">
               <div className="plan-topline">
                 <span>Seu plano de busca</span>
+              </div>
+              <div className="mascot-guide">
+                <Image
+                  src="/easy-job-fox-mascot.png"
+                  alt="Mascote da Easy Job: uma raposa tomando café"
+                  width={1254}
+                  height={1254}
+                  priority
+                  unoptimized
+                  sizes="(max-width: 480px) 92px, 108px"
+                />
+                <div>
+                  <small>Seu guia Easy Job</small>
+                  <strong>Um passo de cada vez.</strong>
+                  <span>Sempre com o próximo passo à vista.</span>
+                </div>
               </div>
               <div className="plan-progress">
                 <div>

@@ -11,8 +11,8 @@ let previewServer;
 
 before(async () => {
   previewServer = spawn(
-    fileURLToPath(new URL("../node_modules/.bin/vinext", import.meta.url)),
-    ["dev", "--port", "4173", "--hostname", "127.0.0.1"],
+    fileURLToPath(new URL("../node_modules/.bin/next", import.meta.url)),
+    ["start", "--port", "4173", "--hostname", "127.0.0.1"],
     {
       cwd: projectRoot,
       env: { ...process.env, NODE_ENV: "production" },
@@ -52,7 +52,9 @@ test("server-renders the Easy Job landing page", async () => {
   assert.match(html, /<title>Easy Job — Sua busca de emprego pronta<\/title>/i);
   assert.match(html, /Entre.*sem nada\./s);
   assert.match(html, /Saia com sua busca de emprego pronta\./);
-  assert.match(html, /Beta fechado/);
+  assert.match(html, /easy-job-fox-mascot\.png/);
+  assert.match(html, /favicon-fox\.png/);
+  assert.match(html, /Um passo de cada vez\./);
   assert.match(html, /name="whatsapp"/);
   assert.match(html, /name="consent"/);
   assert.match(html, /DADOS ILUSTRATIVOS/);
@@ -77,11 +79,30 @@ test("keeps the landing accessible and mobile-first", async () => {
   assert.doesNotMatch(page, /Evolution|Resend|scrap/i);
 });
 
-test("ships the branded social image", async () => {
+test("ships the branded social image and favicon", async () => {
   const socialImage = new URL("../public/og.png", import.meta.url);
-  const stat = await import("node:fs/promises").then(({ stat }) =>
+  const favicon = new URL("../public/favicon-fox.png", import.meta.url);
+  const { stat } = await import("node:fs/promises");
+  const [socialStat, faviconStat] = await Promise.all([
     stat(socialImage),
-  );
-  assert.ok(stat.size > 10_000);
+    stat(favicon),
+  ]);
+  assert.ok(socialStat.size > 10_000);
+  assert.ok(faviconStat.size > 10_000);
   assert.ok(templateRoot);
+});
+
+test("uses the Node-compatible Railway production runtime", async () => {
+  const [packageJson, signupRoute] = await Promise.all([
+    readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(
+      new URL("../app/api/beta-signups/route.ts", import.meta.url),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(packageJson, /"build": "next build"/);
+  assert.match(packageJson, /"start": "next start --hostname 0\.0\.0\.0"/);
+  assert.match(signupRoute, /export const runtime = "nodejs"/);
+  assert.doesNotMatch(signupRoute, /cloudflare:workers|drizzle-orm\/d1/);
 });

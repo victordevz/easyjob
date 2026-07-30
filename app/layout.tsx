@@ -16,6 +16,11 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Easy Job — Sua busca de emprego pronta",
     description:
       "Crie seu currículo, encontre empresas e prepare seus contatos em uma busca de emprego guiada pelo celular.",
+    icons: {
+      icon: [{ url: "/favicon-fox.png", type: "image/png", sizes: "512x512" }],
+      shortcut: "/favicon-fox.png",
+      apple: [{ url: "/favicon-fox.png", sizes: "512x512", type: "image/png" }],
+    },
     openGraph: {
       title: "Easy Job — Sua busca de emprego pronta",
       description:

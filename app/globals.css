@@ -318,6 +318,61 @@ h1 {
   text-transform: uppercase;
 }
 
+.mascot-guide {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--green) 28%, var(--paper-light));
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: rotate(-0.5deg);
+}
+
+.mascot-guide img {
+  display: block;
+  width: 92px;
+  height: 100%;
+  min-height: 92px;
+  border-right: 1.5px solid var(--ink);
+  object-fit: cover;
+}
+
+.mascot-guide div {
+  display: flex;
+  min-width: 0;
+  justify-content: center;
+  flex-direction: column;
+  padding: 11px 12px;
+}
+
+.mascot-guide small {
+  margin-bottom: 2px;
+  color: var(--orange-dark);
+  font-size: 0.46rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mascot-guide strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.mascot-guide span {
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.56rem;
+  line-height: 1.35;
+}
+
 .plan-progress {
   display: flex;
   align-items: flex-end;
@@ -1477,6 +1532,27 @@ h1 {
 
   .text-link {
     justify-content: flex-start;
+  }
+
+  .mascot-guide {
+    grid-template-columns: 108px minmax(0, 1fr);
+  }
+
+  .mascot-guide img {
+    width: 108px;
+    min-height: 108px;
+  }
+
+  .mascot-guide div {
+    padding-inline: 16px;
+  }
+
+  .mascot-guide strong {
+    font-size: 1.1rem;
+  }
+
+  .mascot-guide span {
+    font-size: 0.62rem;
   }
 
   .journey-grid {
