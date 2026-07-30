@@ -49,7 +49,14 @@ test("server-renders the Easy Job landing page", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Easy Job — Sua busca de emprego pronta<\/title>/i);
+  assert.match(
+    html,
+    /<title>Easy Job — Inscreva-se no beta fechado<\/title>/i,
+  );
+  assert.match(
+    html,
+    /Entre na lista de espera e seja uma das primeiras pessoas a testar a Easy Job/,
+  );
   assert.match(html, /Entre.*sem nada\./s);
   assert.match(html, /Saia com sua busca de emprego pronta\./);
   assert.match(html, /easy-job-fox-mascot\.png/);

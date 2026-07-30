@@ -13,18 +13,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase,
-    title: "Easy Job — Sua busca de emprego pronta",
+    title: "Easy Job — Inscreva-se no beta fechado",
     description:
-      "Crie seu currículo, encontre empresas e prepare seus contatos em uma busca de emprego guiada pelo celular.",
+      "Entre na lista de espera da Easy Job e seja uma das primeiras pessoas a testar uma forma mais simples de criar seu currículo, encontrar oportunidades e organizar sua busca de emprego.",
     icons: {
       icon: [{ url: "/favicon-fox.png", type: "image/png", sizes: "512x512" }],
       shortcut: "/favicon-fox.png",
       apple: [{ url: "/favicon-fox.png", sizes: "512x512", type: "image/png" }],
     },
     openGraph: {
-      title: "Easy Job — Sua busca de emprego pronta",
+      title: "Easy Job — Inscreva-se no beta fechado",
       description:
-        "Entre sem nada. Saia com sua busca de emprego pronta.",
+        "Entre na lista de espera e seja uma das primeiras pessoas a testar a Easy Job: currículo, oportunidades e sua busca de emprego organizados pelo celular.",
       type: "website",
       locale: "pt_BR",
       images: [
@@ -32,15 +32,15 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "/og.png",
           width: 1200,
           height: 630,
-          alt: "Easy Job — Entre sem nada. Saia com sua busca de emprego pronta.",
+          alt: "Easy Job — Inscreva-se no beta fechado.",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Easy Job — Sua busca de emprego pronta",
+      title: "Easy Job — Inscreva-se no beta fechado",
       description:
-        "Entre sem nada. Saia com sua busca de emprego pronta.",
+        "Entre na lista de espera e seja uma das primeiras pessoas a testar a Easy Job: currículo, oportunidades e sua busca de emprego organizados pelo celular.",
       images: ["/og.png"],
     },
   };
